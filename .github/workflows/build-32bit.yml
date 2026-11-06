@@ -25,6 +25,20 @@ jobs:
           mkdir -p ${{ github.workspace }}/.gradle
           mkdir -p ${{ github.workspace }}/.android
           
+          # Trik Membuat Folder Tiruan Windows NDK agar Compiler Linux Bisa Berjalan
+          NDK_VERSION_DIR="/usr/local/lib/android/sdk/ndk/27.3.13750724"
+          WIN_BIN_DIR="$NDK_VERSION_DIR/toolchains/llvm/prebuilt/windows-x86_64/bin"
+          LINUX_CLANG="$NDK_VERSION_DIR/toolchains/llvm/prebuilt/linux-x86_64/bin/clang"
+          
+          sudo mkdir -p "$WIN_BIN_DIR"
+          
+          # Buat jalan pintas (shortcut) dari clang.exe tiruan ke clang Linux asli
+          if [ -f "$LINUX_CLANG" ]; then
+            sudo ln -sf "$LINUX_CLANG" "$WIN_BIN_DIR/clang.exe"
+            sudo ln -sf "$LINUX_CLANG"++ "$WIN_BIN_DIR/clang++.exe"
+            echo "Sukses membuat tiruan compiler Windows untuk Linux!"
+          fi
+          
           # Cari letak skrip Python pembangun
           PYTHON_SCRIPT=$(find . -name "build_apk.py" | head -n 1)
           if [ -z "$PYTHON_SCRIPT" ]; then
@@ -34,11 +48,7 @@ jobs:
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
           
-          # Hapus jalur compiler Windows (.exe) agar skrip mencari versi Linux bawaan GitHub
-          find . -type f -name "*.py" -exec sed -i 's/windows-x86_64/linux-x86_64/g' {} +
-          find . -type f -name "*.py" -exec sed -i 's/clang.exe/clang/g' {} +
-          
-          # Eksekusi skrip bawaan tanpa argumen arsitektur paksaan
+          # Jalankan skrip bawaan proyek
           python build_apk.py
 
       - name: Upload Hasil APK
