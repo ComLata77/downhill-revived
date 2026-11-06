@@ -19,15 +19,13 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android NDK
-      uses: android-actions/setup-android@v3
-
     - name: Build APK dengan Gradle
       run: |
-        chmod +x gradlew
-        ./gradlew assembleDebug -Pandroid.injected.build.abi=armeabi-v7a
-        
-        
+          chmod +x gradlew
+          ./gradlew assembleDebug -Pandroid.injected.build.abi=armeabi-v7a -Pandroid.ndkDirectory=$ANDROID_NDK_LATEST_HOME
+          
+          
+          
     - name: Upload Hasil APK 32-bit
       uses: actions/upload-artifact@v4
       with:
