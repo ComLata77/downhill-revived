@@ -25,7 +25,8 @@ jobs:
     - name: Build APK dengan Gradle
       run: |
         chmod +x gradlew
-        ./gradlew assembleDebug -Pandroid.ndk.abiFilters=armeabi-v7a
+        ./gradlew assembleDebug -Pandroid.injected.build.abi=armeabi-v7a
+        
         
     - name: Upload Hasil APK 32-bit
       uses: actions/upload-artifact@v4
