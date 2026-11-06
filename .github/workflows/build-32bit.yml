@@ -19,7 +19,11 @@ jobs:
       - name: Build APK via Python Script
         env:
           GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+          ANDROID_USER_HOME: ${{ github.workspace }}/.android
+          ANDROID_HOME: /usr/local/lib/android/sdk
         run: |
+          mkdir -p ${{ github.workspace }}/.gradle
+          mkdir -p ${{ github.workspace }}/.android
           PYTHON_SCRIPT=$(find . -name "build_apk.py" | head -n 1)
           if [ -z "$PYTHON_SCRIPT" ]; then
             echo "Error: File build_apk.py tidak ditemukan di repositori!"
