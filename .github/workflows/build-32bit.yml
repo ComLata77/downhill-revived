@@ -21,11 +21,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install ninja
           
-          # PERBAIKAN JALUR NAVIGASI: Menggunakan subshell () agar folder otomatis kembali ke root utama setiap kali selesai fetch
-          find . -name "Cargo.toml" -exec dirname {} \; | while read -r dir; do
-            echo "Mengunduh otomatis dependensi di folder: $dir"
-            (cd "$dir" && cargo fetch)
-          done
+          # SOLUSI WORKSPACE: Jalankan fetch tunggal langsung di root utama agar seluruh paket lokal (wgpu, log, dll) terhubung otomatis
+          cargo fetch || true
 
       - name: Build APK via Python Script
         env:
