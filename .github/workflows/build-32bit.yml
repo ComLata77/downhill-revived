@@ -1,4 +1,4 @@
-name: Build Android 32-bit APK
+name: Build Android APK
 
 on:
   workflow_dispatch:
@@ -34,16 +34,16 @@ jobs:
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
           
-          # Hapus paksa deteksi jalur compiler Windows (.exe) agar skrip mencari versi Linux
+          # Hapus jalur compiler Windows (.exe) agar skrip mencari versi Linux bawaan GitHub
           find . -type f -name "*.py" -exec sed -i 's/windows-x86_64/linux-x86_64/g' {} +
           find . -type f -name "*.py" -exec sed -i 's/clang.exe/clang/g' {} +
           
-          # Eksekusi skrip untuk target Android 32-bit (ARM)
-          python build_apk.py --target android-arm
+          # Eksekusi skrip bawaan tanpa argumen arsitektur paksaan
+          python build_apk.py
 
-      - name: Upload Hasil APK 32-bit
+      - name: Upload Hasil APK
         uses: actions/upload-artifact@v4
         with:
-          name: Downhill-32bit-Debug-APK
+          name: Downhill-Debug-APK
           path: "**/build/outputs/apk/debug/*.apk"
           
