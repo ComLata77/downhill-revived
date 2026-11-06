@@ -21,10 +21,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install ninja
           
-          # TRIK SAPU JAGAT: Cari semua folder proyek Rust di repositori dan download semua dependensinya ke cache server
+          # PERBAIKAN JALUR NAVIGASI: Menggunakan subshell () agar folder otomatis kembali ke root utama setiap kali selesai fetch
           find . -name "Cargo.toml" -exec dirname {} \; | while read -r dir; do
             echo "Mengunduh otomatis dependensi di folder: $dir"
-            cd "$dir" && cargo fetch && cd - > /dev/null
+            (cd "$dir" && cargo fetch)
           done
 
       - name: Build APK via Python Script
