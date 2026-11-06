@@ -1,8 +1,6 @@
 name: Build Android 32-bit APK
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,25 +8,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Source Code
-      uses: actions/checkout@v4
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Build APK dengan Gradle
-      run: |
+      - name: Build APK dengan Gradle
+        run: |
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "Error: File gradlew tidak ditemukan di folder mana pun!"
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
+          cd "$PROJECT_DIR"
           chmod +x gradlew
           ./gradlew assembleDebug -Pandroid.injected.build.abi=armeabi-v7a -Pandroid.ndkDirectory=$ANDROID_NDK_LATEST_HOME
+
+      - name: Upload Hasil APK 32-bit
+        uses: actions/upload-artifact@v4
+        with:
+          name: Downhill-32bit-Debug-APK
+          path: "**/build/outputs/apk/debug/*.apk"
           
-          
-          
-    - name: Upload Hasil APK 32-bit
-      uses: actions/upload-artifact@v4
-      with:
-        name: Downhill-32bit-Debug-APK
-        path: app/build/outputs/apk/debug/*.apk
-        
