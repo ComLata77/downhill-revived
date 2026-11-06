@@ -24,6 +24,8 @@ jobs:
         run: |
           mkdir -p ${{ github.workspace }}/.gradle
           mkdir -p ${{ github.workspace }}/.android
+          
+          # Cari letak skrip Python pembangun
           PYTHON_SCRIPT=$(find . -name "build_apk.py" | head -n 1)
           if [ -z "$PYTHON_SCRIPT" ]; then
             echo "Error: File build_apk.py tidak ditemukan di repositori!"
@@ -31,7 +33,13 @@ jobs:
           fi
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
-          python build_apk.py
+          
+          # Hapus paksa deteksi jalur compiler Windows (.exe) agar skrip mencari versi Linux
+          find . -type f -name "*.py" -exec sed -i 's/windows-x86_64/linux-x86_64/g' {} +
+          find . -type f -name "*.py" -exec sed -i 's/clang.exe/clang/g' {} +
+          
+          # Eksekusi skrip untuk target Android 32-bit (ARM)
+          python build_apk.py --target android-arm
 
       - name: Upload Hasil APK 32-bit
         uses: actions/upload-artifact@v4
