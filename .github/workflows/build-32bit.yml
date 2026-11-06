@@ -21,9 +21,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install ninja
           
-          # Unduh dan pasang pustaka grafis Rust ke server agar tersedia secara lokal
-          cargo install --build-arg=log cargo-prefetch || true
-          cargo fetch || true
+          # Unduh paket log Rust secara manual dan masukkan ke cache lokal server
+          cargo new --lib dummy_project
+          cd dummy_project
+          echo 'log = "0.4"' >> Cargo.toml
+          cargo fetch
+          cd ..
+          rm -rf dummy_project
 
       - name: Build APK via Python Script
         env:
@@ -57,11 +61,7 @@ jobs:
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
           
-          # Modifikasi parameter internal Python agar menerima koneksi luar
-          find . -type f -name "*.py" -exec sed -i "s/'--offline'/ /g" {} +
-          find . -type f -name "*.py" -exec sed -i 's/"--offline"/ /g' {} +
-          
-          # Jalankan skrip bawaan proyek secara normal
+          # Jalankan skrip bawaan proyek secara normal tanpa modifikasi file teks
           python build_apk.py
 
       - name: Upload Hasil APK
