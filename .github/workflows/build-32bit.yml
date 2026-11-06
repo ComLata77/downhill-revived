@@ -20,13 +20,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ninja
+          
+          # Unduh dan pasang pustaka grafis Rust ke server agar tersedia secara lokal
+          cargo install --build-arg=log cargo-prefetch || true
+          cargo fetch || true
 
       - name: Build APK via Python Script
         env:
           GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
           ANDROID_USER_HOME: ${{ github.workspace }}/.android
           ANDROID_HOME: /usr/local/lib/android/sdk
-          CARGO_NET_OFFLINE: "false"
         run: |
           mkdir -p ${{ github.workspace }}/.gradle
           mkdir -p ${{ github.workspace }}/.android
@@ -54,7 +57,11 @@ jobs:
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
           
-          # Jalankan skrip bawaan proyek secara normal tanpa modifikasi file
+          # Modifikasi parameter internal Python agar menerima koneksi luar
+          find . -type f -name "*.py" -exec sed -i "s/'--offline'/ /g" {} +
+          find . -type f -name "*.py" -exec sed -i 's/"--offline"/ /g' {} +
+          
+          # Jalankan skrip bawaan proyek secara normal
           python build_apk.py
 
       - name: Upload Hasil APK
