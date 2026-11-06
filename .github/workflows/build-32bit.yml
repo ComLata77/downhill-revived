@@ -26,6 +26,7 @@ jobs:
           GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
           ANDROID_USER_HOME: ${{ github.workspace }}/.android
           ANDROID_HOME: /usr/local/lib/android/sdk
+          CARGO_NET_OFFLINE: "false"
         run: |
           mkdir -p ${{ github.workspace }}/.gradle
           mkdir -p ${{ github.workspace }}/.android
@@ -53,10 +54,7 @@ jobs:
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
           
-          # JALUR ONLINE: Matikan paksa parameter '--offline' di dalam semua skrip python agar server bisa download library render
-          find . -type f -name "*.py" -exec sed -i 's/--offline//g' {} +
-          
-          # Jalankan skrip bawaan proyek
+          # Jalankan skrip bawaan proyek secara normal tanpa modifikasi file
           python build_apk.py
 
       - name: Upload Hasil APK
