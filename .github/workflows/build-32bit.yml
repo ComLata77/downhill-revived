@@ -21,13 +21,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install ninja
           
-          # Unduh paket log Rust secara manual dan masukkan ke cache lokal server
-          cargo new --lib dummy_project
-          cd dummy_project
-          echo 'log = "0.4"' >> Cargo.toml
-          cargo fetch
-          cd ..
-          rm -rf dummy_project
+          # TRIK SAPU JAGAT: Cari semua folder proyek Rust di repositori dan download semua dependensinya ke cache server
+          find . -name "Cargo.toml" -exec dirname {} \; | while read -r dir; do
+            echo "Mengunduh otomatis dependensi di folder: $dir"
+            cd "$dir" && cargo fetch && cd - > /dev/null
+          done
 
       - name: Build APK via Python Script
         env:
@@ -61,7 +59,7 @@ jobs:
           SCRIPT_DIR=$(dirname "$PYTHON_SCRIPT")
           cd "$SCRIPT_DIR"
           
-          # Jalankan skrip bawaan proyek secara normal tanpa modifikasi file teks
+          # Jalankan skrip bawaan proyek secara normal
           python build_apk.py
 
       - name: Upload Hasil APK
